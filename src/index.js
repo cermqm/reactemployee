@@ -1,17 +1,31 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
 import styled from 'styled-components'
-import employees from "./data/employeedata.json";
-import { useTable, useSortBy, useFilters, useGlobalFilter } from 'react-table'
+import employees from "./data/employeedata.json";  // Import json data file
+import { useTable, useSortBy, useFilters, useGlobalFilter, useResizeColumns, useFlexLayout, useRowSelect } from 'react-table'
 import {matchSorter} from 'match-sorter'
-import "./index.css";
+import "./index.css"; // Import css for index.js
+
+//For the layout, sorting and filtering I used https://react-table.tanstack.com/ as the library and customized to fit my use case.
+//For the data I used https://mockaroo.com/ to generate 1000 records of fake employee data. 
 
 const Styles = styled.div`
   padding: 1rem;
 
+  display: block;
+  overflow: auto;
+
+  .react-table-column-flex-grow-1 {
+    flex-grow: 1 !important;
+    width: unset !important;
+    flex-basis: 5px !important;
+    max-width: none !important;
+  }
+
   table {
     border-spacing: 0;
     border: 1px solid black;
+    margin: auto;
 
     tr {
       :last-child {
@@ -86,6 +100,10 @@ function Table({ columns, data }) {
     () => ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
+      // When using the useFlexLayout:
+      minWidth: 30, // minWidth is only used as a limit for resizing
+      width: 300, // width is used for both the flex-basis and flex-grow
+      maxWidth: 400, // maxWidth is only used as a limit for resizing
     }),
     []
   )
@@ -107,7 +125,10 @@ function Table({ columns, data }) {
   },
     useFilters, // useFilters!
     useGlobalFilter, // useGlobalFilter!
-    useSortBy
+    useSortBy,
+    useResizeColumns,
+    useFlexLayout,
+    useRowSelect,
   )
 
   // Render the UI for your table
@@ -170,11 +191,15 @@ function App() {
           {
             Header: 'Last',
             accessor: 'last_name',
+            flexGrow: 1,
+            width: 200 // you could also play with the width value 
           },
           {
             Header: 'First',
             accessor: 'first_name',
             disableFilters: true,
+            flexGrow: 1,
+            width: 150 // you could also play with the width value 
           },
         ],
       },
@@ -184,24 +209,22 @@ function App() {
           {
             Header: 'Title',
             accessor: 'job_title',
+            flexGrow: 1,
+            width: 250 // you could also play with the width value 
           },
           {
             Header: 'Email',
             accessor: 'email',
             disableFilters: true,
+            flexGrow: 1,
+            width: 300 // you could also play with the width value 
           },
           {
             Header: 'Dept',
             accessor: 'department',
+            flexGrow: 1,
+            width: 250 // you could also play with the width value 
           },
-          // {
-          //   Header: '#',
-          //   accessor: 'phonenumber',
-          // },
-          // {
-          //   Header: 'Skill',
-          //   accessor: 'linkedinskill',
-          // },
         ],
       },
     ],
@@ -210,10 +233,11 @@ function App() {
 
   return (
     <div>
-      <h1 id='title'>Employee Directory</h1>
-      <Styles>
-        <Table columns={columns} data={employees} />
-      </Styles>
+      <h1 id='title'>DAMM Technologies</h1>
+      <h2 id='title'>Employee Directory</h2>
+        <Styles>
+          <Table columns={columns} data={employees} />
+        </Styles>
     </div>
   )
 }

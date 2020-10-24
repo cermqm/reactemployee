@@ -10,6 +10,8 @@ table {
 
 body {
   background-color: lightseagreen;
+  margin: 20px;
+  padding-top: 20px;
 }
 
 #employees {
