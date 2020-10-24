@@ -2,10 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import styled from 'styled-components'
 import employees from "./data/employeedata.json";
-import { useTable, useSortBy } from 'react-table'
-
-
-// import makeData from './makeData'
+import { useTable, useSortBy, useFilters, useGlobalFilter } from 'react-table'
+import {matchSorter} from 'match-sorter'
+import "./index.css";
 
 const Styles = styled.div`
   padding: 1rem;
@@ -36,7 +35,61 @@ const Styles = styled.div`
   }
 `
 
+// Define a default UI for filtering
+function DefaultColumnFilter({
+  column: { filterValue, preFilteredRows, setFilter },
+}) {
+  const count = preFilteredRows.length
+
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={e => {
+        setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
+      }}
+      placeholder={`Search ${count} records...`}
+    />
+  )
+}
+
+function fuzzyTextFilterFn(rows, id, filterValue) {
+  return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
+}
+
+// Let the table remove the filter if the string is empty
+fuzzyTextFilterFn.autoRemove = val => !val
+
+
 function Table({ columns, data }) {
+
+  const filterTypes = React.useMemo(
+    () => ({
+      // Add a new fuzzyTextFilterFn filter type.
+      fuzzyText: fuzzyTextFilterFn,
+      // Or, override the default text filter to use
+      // "startWith"
+      text: (rows, id, filterValue) => {
+        return rows.filter(row => {
+          const rowValue = row.values[id]
+          return rowValue !== undefined
+            ? String(rowValue)
+                .toLowerCase()
+                .startsWith(String(filterValue).toLowerCase())
+            : true
+        })
+      },
+    }),
+    []
+  )
+
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: DefaultColumnFilter,
+    }),
+    []
+  )
+
   // Use the state and functions returned from useTable to build your UI
   const {
     getTableProps,
@@ -44,11 +97,16 @@ function Table({ columns, data }) {
     headerGroups,
     rows,
     prepareRow,
+    visibleColumns,
     
   } = useTable({
     columns,
     data,
+    defaultColumn, // Be sure to pass the defaultColumn option
+    filterTypes
   },
+    useFilters, // useFilters!
+    useGlobalFilter, // useGlobalFilter!
     useSortBy
   )
 
@@ -63,6 +121,8 @@ function Table({ columns, data }) {
                 // we can add them into the header props
                 <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render('Header')}
+                  {/* Render the columns filter UI */}
+                  <div>{column.canFilter ? column.render("Filter") : null}</div>
                   {/* Add a sort direction indicator */}
                   <span>
                     {column.isSorted
@@ -75,14 +135,23 @@ function Table({ columns, data }) {
                 ))}
           </tr>
         ))}
+        <tr>
+            <th
+              colSpan={visibleColumns.length}
+              style={{
+                textAlign: "left"
+              }}
+            >
+            </th>
+          </tr>
       </thead>
       <tbody {...getTableBodyProps()}>
         {rows.map((row, i) => {
           prepareRow(row)
           return (
-            <tr {...row.getRowProps()}>
+            <tr {...row.getRowProps()}  id='employees' className={i}>
               {row.cells.map(cell => {
-                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                return <td {...cell.getCellProps()} id='employees'>{cell.render('Cell')}</td>
               })}
             </tr>
           )
@@ -99,12 +168,13 @@ function App() {
         Header: 'Name',
         columns: [
           {
-            Header: 'First Name',
-            accessor: 'first_name',
+            Header: 'Last',
+            accessor: 'last_name',
           },
           {
-            Header: 'Last Name',
-            accessor: 'last_name',
+            Header: 'First',
+            accessor: 'first_name',
+            disableFilters: true,
           },
         ],
       },
@@ -112,37 +182,39 @@ function App() {
         Header: 'Info',
         columns: [
           {
-            Header: 'ID',
-            accessor: 'id',
+            Header: 'Title',
+            accessor: 'job_title',
           },
           {
             Header: 'Email',
             accessor: 'email',
+            disableFilters: true,
           },
           {
-            Header: 'Gender',
-            accessor: 'gender',
+            Header: 'Dept',
+            accessor: 'department',
           },
-          {
-            Header: 'Job Title',
-            accessor: 'job_title',
-          },
-          {
-            Header: 'Manager',
-            accessor: 'manager',
-          },
+          // {
+          //   Header: '#',
+          //   accessor: 'phonenumber',
+          // },
+          // {
+          //   Header: 'Skill',
+          //   accessor: 'linkedinskill',
+          // },
         ],
       },
     ],
     []
   )
 
-  // const data = React.useMemo(() => makeData(20), [])
-
   return (
-    <Styles>
-      <Table columns={columns} data={employees} />
-    </Styles>
+    <div>
+      <h1 id='title'>Employee Directory</h1>
+      <Styles>
+        <Table columns={columns} data={employees} />
+      </Styles>
+    </div>
   )
 }
 
