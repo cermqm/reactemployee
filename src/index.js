@@ -5,6 +5,7 @@ import employees from "./data/employeedata.json";  // Import json data file
 import { useTable, useSortBy, useFilters, useGlobalFilter, useResizeColumns, useFlexLayout, useRowSelect } from 'react-table'
 import {matchSorter} from 'match-sorter'
 import "./index.css"; // Import css for index.js
+import Logo from "./logo.jpg";
 
 //For the layout, sorting and filtering I used https://react-table.tanstack.com/ as the library and customized to fit my use case.
 //For the data I used https://mockaroo.com/ to generate 1000 records of fake employee data. 
@@ -233,8 +234,20 @@ function App() {
 
   return (
     <div>
+      <table id='theader'>
+        <tbody>
+          <tr id='trheader'>
+            <td><img src={Logo} alt="logo" id='logo'/></td>
+            <td>
+              <h1 id='title'>DAMM Technologies</h1>
+              <h2 id='title'>Employee Directory</h2>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {/* <img src={Logo} alt="logo" id='logo'/>
       <h1 id='title'>DAMM Technologies</h1>
-      <h2 id='title'>Employee Directory</h2>
+      <h2 id='title'>Employee Directory</h2> */}
         <Styles>
           <Table columns={columns} data={employees} />
         </Styles>

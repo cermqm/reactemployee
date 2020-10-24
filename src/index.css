@@ -4,10 +4,6 @@
 
 }
 
-table {
-  /* border: 5px solid black; */
-}
-
 body {
   background-color: lightseagreen;
   margin: 20px;
@@ -18,19 +14,15 @@ body {
   text-align: center;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
-  /* border: 3px solid black; */
   width: 100%;
 }
 
 #employees td, #employees th {
-  /* border: 3px solid black; */
   padding: 8px;
 }
 
 tr:nth-child(even){background-color: white;}
 tr {background-color: lightgray;}
-
-/* #employees tr:hover {background-color: #ddd;} */
 
 th {
   padding-top: 12px;
@@ -38,6 +30,22 @@ th {
   text-align: center;
   background-color: white;
   color: black;
+}
 
+img {
+  width: 150px;
+}
+
+#theader {
+  margin-left:auto;
+  margin-right:auto;
+}
+
+#trheader {
+  background-color: lightseagreen;
+}
+
+h1, h2 {
+  margin-left:40px;
 }
 
